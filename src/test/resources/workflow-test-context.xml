@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:si="http://www.springframework.org/schema/integration"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context-3.0.xsd
+		http://www.springframework.org/schema/integration
+        http://www.springframework.org/schema/integration/spring-integration.xsd">
+
+	<context:component-scan base-package="it.sky.workflow" />
+	
+	<si:channel id="A-QUEUE" />
+	<si:channel id="B-QUEUE" />
+	<si:channel id="END-QUEUE" />
+	<si:channel id="WF-QUEUE" />
+	
+	<bean id="springAsyncAdapter" class="it.sky.workflow.adapter.spring.SpringAsyncAdapter" />
+	<bean id="springAsyncLoopAdapter" class="it.sky.workflow.adapter.spring.SpringAsyncLoopAdapter" />
+	
+	<si:outbound-channel-adapter id="A-QUEUE-Adapter" ref="springAsyncAdapter" channel="A-QUEUE" />
+	<si:outbound-channel-adapter id="B-QUEUE-Adapter" ref="springAsyncAdapter" channel="B-QUEUE" />
+	<si:outbound-channel-adapter id="END-QUEUE-Adapter" ref="springAsyncAdapter" channel="END-QUEUE" />
+	<si:outbound-channel-adapter id="WF-QUEUE-Adapter" ref="springAsyncLoopAdapter" channel="WF-QUEUE" />
+	
+	<bean id="springAsyncDispatcherA" class="it.sky.workflow.impl.dispatcher.spring.SpringAsyncDispatcher">
+		<constructor-arg index="0" value="A-QUEUE" />
+		<property name="channel" ref="A-QUEUE" />
+	</bean>
+	
+	<bean id="springAsyncDispatcherB" class="it.sky.workflow.impl.dispatcher.spring.SpringAsyncDispatcher">
+		<constructor-arg index="0" value="B-QUEUE" />
+		<property name="channel" ref="B-QUEUE" />
+	</bean>
+	
+	<bean id="springAsyncDispatcherEND" class="it.sky.workflow.impl.dispatcher.spring.SpringAsyncDispatcher">
+		<constructor-arg index="0" value="END-QUEUE" />
+		<property name="channel" ref="END-QUEUE" />
+	</bean>
+	
+	<bean id="springAsyncLoopDispatcher" class="it.sky.workflow.impl.dispatcher.spring.SpringAsyncLoopDispatcher">
+		<constructor-arg index="0" value="NO-VAL" />
+		<property name="channelA" ref="A-QUEUE" />
+		<property name="channelB" ref="B-QUEUE" />
+		<property name="channelEND" ref="END-QUEUE" />
+		<property name="channelWF" ref="WF-QUEUE" />
+	</bean>
+	
+	
+</beans>
